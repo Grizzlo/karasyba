@@ -14,14 +14,17 @@ public class Kathuba {
         System.out.println("Enter X and Y");
         String x = sc1.nextLine();
         String y = sc2.nextLine();
-        System.out.println("x = "+String.format("%64.0f",Double.parseDouble(x)));
-        System.out.println("y = "+String.format("%64.0f",Double.parseDouble(y)));
-        System.out.println("sol = "+String.format("%127.0f",recurce_sol(x,y)));
-        double sol=Double.parseDouble(x)*Double.parseDouble(y);
-        System.out.println("sol1 = "+String.format("%127.0f",sol));
+        BigInteger x1 = new BigInteger(x);
+        BigInteger y1 = new BigInteger(y);
+        System.out.println(x);
+        System.out.println(y);
+        System.out.println(recurce_sol(x,y));
+        // double sol=Double.parseDouble(x)*Double.parseDouble(y);
+        System.out.println("sol1 = "+ x1.multiply(y1));
+
     }
-    double recurce_sol(String x, String y){
-        double sol=0;
+    BigInteger recurce_sol(String x, String y){//change data type
+        BigInteger sol= new BigInteger("0");
         String [] ab=new String[2];
         String [] cd=new String[2];
         String [] xy=new String[2];
@@ -38,12 +41,19 @@ public class Kathuba {
             cd=decompos(xy[1]);
             int lngth = xy[0].length();
             System.out.println("Length= "+lngth);
-            double ac = recurce_sol(ab[0],cd[0]);
+            System.out.println("Decompos a= "+ab[0]);
+            System.out.println("Decompos b= "+ab[1]);
+            System.out.println("Decompos c= "+cd[0]);
+            System.out.println("Decompos d= "+cd[1]);
+            BigInteger ac = recurce_sol(ab[0],cd[0]);
             System.out.println("AC = "+ ac);
-            double bd = recurce_sol(ab[1],cd[1]);
+            BigInteger bd = recurce_sol(ab[1],cd[1]);
             System.out.println("BD = "+ bd);
             String [] abcd1 = abcd(ab[0],ab[1],cd[0],cd[1]);
-            double abcd = recurce_sol(abcd1[0],abcd1[1]);
+            System.out.println("Decompos a+b= "+abcd1[0]);
+            System.out.println("Decompos c+d= "+abcd1[1]);
+            BigInteger abcd = recurce_sol(abcd1[0],abcd1[1]);
+            System.out.println("Decompos (a+b)(b+d)= "+abcd);
             sol = Kath_solve(ac,bd,abcd,lngth);
         }
         else {
@@ -59,7 +69,17 @@ public class Kathuba {
             //System.out.println(ab[0]+" "+ab[1]+" "+cd[0]+" "+cd[1]);
             sol=Kath_solve(ab[0],ab[1],cd[0],cd[1]);
         }
+        /*if (sol != soln(x,y)) {
+            System.out.println(soln(x,y));
+            System.out.println(sol);
+            System.out.println("FALSE EQUAL");
+        }*/
         return sol;
+    }
+    BigInteger soln (String n1, String n2) {
+        BigInteger n11 = new BigInteger(n1) ;
+        BigInteger n12 = new BigInteger(n2) ;
+        return n11.multiply(n12);
     }
     /*int length(double num, int numb){
         int lng = 0;
@@ -90,7 +110,7 @@ public class Kathuba {
         else{
             qrt_length=num2.length();
         }
-        System.out.println("Length y = "+qrt_length);
+        //System.out.println("Length y = "+qrt_length);
 
         int j=2;
         int lg=2;
@@ -100,9 +120,11 @@ public class Kathuba {
             j=j*2;
         }
         // найближче значення
-        System.out.println(num.length());
+        System.out.println(""+num.length());
         for (int i = 0; i<lg-num.length();i++) zer[0]="0"+zer[0];
         for (int i = 0; i<lg-num2.length();i++) zer[1]="0"+zer[1];
+        System.out.println("num1 = "+zer[0]);
+        System.out.println("num2 = "+zer[1]);
         return zer;
     }
     String [] decompos(String num){
@@ -112,12 +134,14 @@ public class Kathuba {
         dec[1]=num.substring(num.length()/2,num.length());
         return dec;
     }
-    double Kath_solve(String a,String b,String c, String d){
-        double solv = 0;
+    BigInteger Kath_solve(String a,String b,String c, String d){
+        BigInteger solv= new BigInteger("0");
         int ac,bd,abcd,ab,cd;
         ab = Integer.parseInt(a) + Integer.parseInt(b);
+        //System.out.println("ab_Kath_solve = "+ab);
         cd = Integer.parseInt(c) + Integer.parseInt(d);
-        if ((ab > 9)||(cd > 9)){
+        //System.out.println("cd_Kath_solve = "+cd);
+        if ((ab > 9)||(cd > 9)){//додробити за алгоритмом
             int a1,b1,c1,d1,ac1,bd1,abcd1;
             a1 = ab/10;
             b1 = ab%10;
@@ -132,23 +156,28 @@ public class Kathuba {
         ac = Integer.parseInt(a)*Integer.parseInt(c);
         //System.out.println("ac = "+ac);
         bd = Integer.parseInt(b)*Integer.parseInt(d);
-        solv =ac * 100 + bd + (abcd - ac - bd)*10;
+        solv =solv.valueOf(ac * 100 + bd + (abcd - ac - bd)*10);
         return solv;
     }
-    double Kath_solve(double ac,double bd,double abcd, int length){
-        double solv;
-        solv = ac * Math.pow(10.0,length) + bd +(abcd-ac-bd)*Math.pow(10.0,length/2);
+    BigInteger Kath_solve(BigInteger ac,BigInteger bd,BigInteger abcd, int length){
+        BigInteger solv= new BigInteger("0");
+        BigInteger exp= new BigInteger("10");
+        solv = ac.multiply(exp.pow(length)).add(bd.add(abcd.add(ac.add(bd).negate()).multiply(exp.pow(length/2))));
         return solv;
     }
     String [] abcd(String a,String b,String c, String d){
         String [] abcd = new String[2];
-        double ab,cd;
-        ab = Double.parseDouble(a)+Double.parseDouble(b);
-        cd = Double.parseDouble(c)+Double.parseDouble(d);
-        abcd[0] = String.format("%.0f",ab);
-        abcd[1] = String.format("%.0f",cd);
-        System.out.println("abcd0 = "+abcd[0]);
-        System.out.println("abcd1 = "+abcd[1]);
+        BigInteger ab,cd;
+        BigInteger a1 = new BigInteger(a);
+        BigInteger b1 = new BigInteger(b);
+        BigInteger c1 = new BigInteger(c);
+        BigInteger d1 = new BigInteger(d);
+        ab = a1.add(b1);
+        cd = c1.add(d1);
+        abcd[0] = ab.toString();
+        abcd[1] = cd.toString();
+        //System.out.println("abcd0 = "+abcd[0]);
+        //System.out.println("abcd1 = "+abcd[1]);
         return abcd;
     }
     boolean two(int length){
